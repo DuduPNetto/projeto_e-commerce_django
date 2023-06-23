@@ -28,4 +28,7 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('-id',)
     list_filter = ('id',)
     list_editable = ('price', 'promotional_price', 'product_type')
+    prepopulated_fields = {
+        "slug": ('name',)
+    }
     inlines = [VariationInline]
