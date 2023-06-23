@@ -10,5 +10,4 @@ class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ('id', 'user', 'birthday', 'cpf', 'address',
                      'neighborhood', 'city', 'state')
     ordering = ('-id',)
-    list_filter = ('id',)
     list_editable = ('age', 'city', 'state')

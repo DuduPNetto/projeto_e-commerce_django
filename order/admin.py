@@ -10,7 +10,6 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'product', 'product_id')
     search_fields = ('id', 'product', 'product_id')
     ordering = ('-id',)
-    list_filter = ('id',)
     list_editable = ('variation', 'price', 'promotional_price', 'quantity')
 
 
@@ -25,6 +24,5 @@ class OrderAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'user')
     search_fields = ('id', 'user', 'status')
     ordering = ('-id',)
-    list_filter = ('id',)
     list_editable = ('total', 'status')
     inlines = [OrderItemInline]

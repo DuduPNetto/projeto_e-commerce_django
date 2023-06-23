@@ -10,7 +10,6 @@ class Variation(admin.ModelAdmin):
     list_display_links = ('id', 'product', 'name')
     search_fields = ('id', 'product', 'name')
     ordering = ('-id',)
-    list_filter = ('id',)
     list_editable = ('price', 'promotional_price', 'stock')
 
 
@@ -26,7 +25,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'name', 'slug')
     search_fields = ('id', 'name', 'slug')
     ordering = ('-id',)
-    list_filter = ('id',)
     list_editable = ('price', 'promotional_price', 'product_type')
     prepopulated_fields = {
         "slug": ('name',)
