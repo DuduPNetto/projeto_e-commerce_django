@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'product',
     'order',
-    'profile',
+    'user_profile',
     'debug_toolbar'
 ]
 

@@ -20,8 +20,8 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     class Meta:
-        verbose_name = 'OrdemItem'
-        verbose_name_plural = 'OrdemItems'
+        verbose_name = 'OrderItem'
+        verbose_name_plural = 'OrderItems'
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.CharField(max_length=100)
