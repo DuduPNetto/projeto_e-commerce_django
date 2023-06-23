@@ -21,10 +21,11 @@ class VariationInline(admin.TabularInline):
 
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'slug', 'price', 'promotional_price')
+    list_display = ('id', 'name', 'slug', 'price',
+                    'promotional_price', 'product_type')
     list_display_links = ('id', 'name', 'slug')
     search_fields = ('id', 'name', 'slug')
     ordering = ('-id',)
     list_filter = ('id',)
-    list_editable = ('price', 'promotional_price')
+    list_editable = ('price', 'promotional_price', 'product_type')
     inlines = [VariationInline]
