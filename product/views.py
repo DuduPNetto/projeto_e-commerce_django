@@ -3,10 +3,14 @@ from django.shortcuts import render
 from django.views import View
 from django.views.generic.list import ListView
 
+from product import models
+
 
 class ProductsList(ListView):
-    def get(self, *args, **kwargs):
-        return HttpResponse('ProductsList')
+    model = models.Product
+    template_name = 'product/list.html'
+    context_object_name = 'products'
+    paginate_by = 9
 
 
 class Detail(View):

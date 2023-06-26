@@ -25,7 +25,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'name', 'slug')
     search_fields = ('id', 'name', 'slug')
     ordering = ('-id',)
-    list_editable = ('price', 'promotional_price', 'product_type')
+    list_editable = ('price', 'promotional_price', 'product_type',)
     prepopulated_fields = {
         "slug": ('name',)
     }

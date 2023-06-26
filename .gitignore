@@ -1,5 +1,5 @@
-static/
-media/
+/static/
+/media/
 project/local_settings.py
 gunicorn-error-log
 __localcode

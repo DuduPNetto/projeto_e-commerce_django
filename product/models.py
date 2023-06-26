@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 
+from utils.format_price import format_price_to_real
 from utils.resize_image import resize_image
 
 
@@ -16,10 +17,18 @@ class Product(models.Model):
         upload_to='image_products/%Y/%m', blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
     price = models.FloatField()
-    promotional_price = models.FloatField(default=0)
+    promotional_price = models.FloatField(default=0, blank=True, null=True)
     product_type = models.CharField(
         default='V', max_length=1, choices=(('V', 'Variável'), ('S', 'Simples'))
     )
+
+    # def get_formatted_price(self):
+    #     return format_price_to_real(self.price)
+    # get_formatted_price.short_description = 'Price'
+
+    # def get_formatted_promotional_price(self):
+    #     return format_price_to_real(self.promotional_price)
+    # get_formatted_promotional_price.short_description = 'Promotional Price'
 
     def save(self, *args, **kwargs):
         if not self.slug:
