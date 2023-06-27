@@ -1,5 +1,7 @@
+from django.contrib import messages
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views import View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -23,7 +25,29 @@ class Detail(DetailView):
 
 class AddToCart(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('add to cart')
+        variation_id = self.request.GET.get('vid')
+
+        if not variation_id:
+            messages.error(
+                self.request,
+                'Invalid Product'
+            )
+            return redirect('product:list')
+
+        variation = get_object_or_404(models.Variation, id=variation_id)
+
+        if not self.request.session.get('cart'):
+            self.request.session['cart'] = {}
+            self.request.session.save()
+
+        cart = self.request.session['cart']
+
+        if variation_id in cart:
+            ...
+        else:
+            ...
+
+        return HttpResponse(f'{variation.product} {variation.name}')
 
 
 class RemoveFromCart(View):
