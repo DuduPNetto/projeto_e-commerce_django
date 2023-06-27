@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -25,6 +27,10 @@ class Detail(DetailView):
 
 class AddToCart(View):
     def get(self, *args, **kwargs):
+        if self.request.session.get('cart'):
+            del self.request.session['cart']
+            self.request.session.save()
+
         variation_id = self.request.GET.get('vid')
 
         if not variation_id:
@@ -35,6 +41,27 @@ class AddToCart(View):
             return redirect('product:list')
 
         variation = get_object_or_404(models.Variation, id=variation_id)
+        product = variation.product
+
+        variation_stock = variation.stock
+
+        product_id = product.pk
+        product_name = product.name
+        variation_name = variation.name or ''
+        unitary_price = variation.price
+        promotional_unitary_price = variation.promotional_price
+        quantity = 1
+        slug = product.slug
+        image = product.image
+
+        if image:
+            image = image.name
+        else:
+            image = ''
+
+        if variation.stock < 1:
+            messages.error(self.request, 'Stock Insufficient')
+            return redirect('product:list')
 
         if not self.request.session.get('cart'):
             self.request.session['cart'] = {}
@@ -43,11 +70,38 @@ class AddToCart(View):
         cart = self.request.session['cart']
 
         if variation_id in cart:
-            ...
-        else:
-            ...
+            quantity_cart = cart[variation_id]['quantity']
+            quantity_cart += 1
 
-        return HttpResponse(f'{variation.product} {variation.name}')
+            if variation_stock < quantity_cart:
+                messages.warning(
+                    self.request,
+                    f'Stock Insufficient for {quantity_cart}x of product {product_name}'
+                )
+
+            cart[variation_id]['quantity'] = quantity_cart
+            cart[variation_id]['quantity_price'] = (
+                unitary_price * quantity_cart)
+            cart[variation_id]['quantity_promotional_price'] = (
+                promotional_unitary_price * quantity_cart)
+        else:
+            cart[variation_id] = {
+                'product_id': product_id,
+                'product_name': product_name,
+                'variation_name': variation_name,
+                'unitary_price': unitary_price,
+                'promotional_unitary_price': promotional_unitary_price,
+                'quantity': quantity,
+                'slug': slug,
+                'image': image,
+            }
+
+        self.request.session.save()
+
+        messages.success(
+            self.request, f'Product {product_name} add into the cart')
+
+        return redirect('product:list')
 
 
 class RemoveFromCart(View):
@@ -57,7 +111,7 @@ class RemoveFromCart(View):
 
 class Cart(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('cart')
+        return render(self.request, 'product/cart.html')
 
 
 class Checkout(View):
