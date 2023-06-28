@@ -28,21 +28,23 @@
 
                 <form action="{% url 'product:add' %}" id="form-add-to-cart">
                     <div class="form-group">
-                        <select id="select-variacoes" name="vid" class="form-control form-control-lg">
-                            {% for variation in product.variation_set.all %}
-                                {% if variation.promotional_price %}
-                                    <option data-preco="{{ variation.price|format_price }}" data-preco-promocional="{{ variation.promotional_price|format_price }}" value="{{ variation.id }}">
-                                    {% if variation.name %}
-                                    {{ variation.name }}
+                        {% if product.variation_set.all %}
+                            <select id="select-variacoes" name="vid" class="form-control form-control-lg">
+                                {% for variation in product.variation_set.all %}
+                                    {% if variation.promotional_price %}
+                                        <option data-preco="{{ variation.price|format_price }}" data-preco-promocional="{{ variation.promotional_price|format_price }}" value="{{ variation.id }}">
+                                        {% if variation.name %}
+                                        {{ variation.name }}
+                                        {% else %}
+                                        {{ variation }}
+                                        {% endif %}
+                                        </option>
                                     {% else %}
-                                    {{ variation }}
+                                        <option data-preco="{{ variation.price|format_price }}" value="{{ variation.id }}">{{ variation }}</option>
                                     {% endif %}
-                                    </option>
-                                {% else %}
-                                    <option data-preco="{{ variation.price|format_price }}" value="{{ variation.id }}">{{ variation }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
                     </div>
 
                     <div class="text-left">

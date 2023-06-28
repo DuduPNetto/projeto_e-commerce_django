@@ -27,10 +27,6 @@ class Detail(DetailView):
 
 class AddToCart(View):
     def get(self, *args, **kwargs):
-        if self.request.session.get('cart'):
-            del self.request.session['cart']
-            self.request.session.save()
-
         variation_id = self.request.GET.get('vid')
 
         if not variation_id:
@@ -88,6 +84,7 @@ class AddToCart(View):
             cart[variation_id] = {
                 'product_id': product_id,
                 'product_name': product_name,
+                'variation_id': variation_id,
                 'variation_name': variation_name,
                 'unitary_price': unitary_price,
                 'promotional_unitary_price': promotional_unitary_price,
@@ -106,12 +103,37 @@ class AddToCart(View):
 
 class RemoveFromCart(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('remove from cart')
+        variation_id = self.request.GET.get('vid')
+
+        if not variation_id:
+            return redirect('product:list')
+
+        if not self.request.session.get('cart'):
+            return redirect('product:list')
+
+        if variation_id not in self.request.session['cart']:
+            return redirect('product:list')
+
+        cart = self.request.session['cart'][variation_id]
+
+        messages.success(
+            self.request,
+            f'Product {cart["product_name"]} {cart["variation_name"]} removed.'
+        )
+
+        del self.request.session['cart'][variation_id]
+        self.request.session.save()
+
+        return redirect('product:cart')
 
 
 class Cart(View):
     def get(self, *args, **kwargs):
-        return render(self.request, 'product/cart.html')
+        context = {
+            'cart': self.request.session.get('cart', {})
+        }
+
+        return render(self.request, 'product/cart.html', context)
 
 
 class Checkout(View):
