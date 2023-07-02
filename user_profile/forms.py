@@ -35,7 +35,6 @@ class UserForm(forms.ModelForm):
                   'password', 'password2')
 
     def clean(self) -> Dict[str, Any]:
-        data = self.data
         cleaned_data = self.cleaned_data
 
         validation_error_msgs = {}
@@ -52,6 +51,7 @@ class UserForm(forms.ModelForm):
         error_msg_email_exists = 'Email Already exists.'
         error_msg_password_match = 'Passwords do not match.'
         error_msg_password_short = 'Minimun 6 characters.'
+        error_msg_required_field = 'Required Field.'
 
         if self.user:
             if user_db:
@@ -73,7 +73,27 @@ class UserForm(forms.ModelForm):
                 if len(password2_data) < 6:
                     validation_error_msgs['password2'] = error_msg_password_short
         else:
-            ...
+            if user_db:
+                validation_error_msgs['username'] = error_msg_user_exists
+
+            if email_db:
+                validation_error_msgs['email'] = error_msg_email_exists
+
+            if not password_data:
+                validation_error_msgs['password'] = error_msg_required_field
+
+            if not password2_data:
+                validation_error_msgs['password'] = error_msg_required_field
+
+            if password_data != password2_data:
+                validation_error_msgs['password'] = error_msg_password_match
+                validation_error_msgs['password2'] = error_msg_password_match
+
+            if len(password_data) < 6:
+                validation_error_msgs['password'] = error_msg_password_short
+
+            if len(password2_data) < 6:
+                validation_error_msgs['password2'] = error_msg_password_short
 
         if validation_error_msgs:
             raise (forms.ValidationError(validation_error_msgs, code='invalid'))
