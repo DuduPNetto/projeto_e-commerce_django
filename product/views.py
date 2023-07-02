@@ -15,7 +15,8 @@ class ProductsList(ListView):
     model = models.Product
     template_name = 'product/list.html'
     context_object_name = 'products'
-    paginate_by = 9
+    paginate_by = 1
+    ordering = 'id'
 
 
 class Detail(DetailView):
@@ -138,4 +139,12 @@ class Cart(View):
 
 class Checkout(View):
     def get(self, *args, **kwargs):
-        return HttpResponse('checkout')
+        if not self.request.user.is_authenticated:
+            return redirect('user_profile:create')
+
+        context = {
+            'user': self.request.user,
+            'cart': self.request.session['cart']
+        }
+
+        return render(self.request, 'product/checkout.html', context)
