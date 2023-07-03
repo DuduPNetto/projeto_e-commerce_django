@@ -10,5 +10,6 @@ urlpatterns = [
     path('add/', views.AddToCart.as_view(), name="add"),
     path('remove/', views.RemoveFromCart.as_view(), name="remove"),
     path('cart/', views.Cart.as_view(), name="cart"),
-    path('checkout/', views.Checkout.as_view(), name="checkout")
+    path('checkout/', views.Checkout.as_view(), name="checkout"),
+    path('search/', views.Search.as_view(), name="search")
 ]

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.views.generic.detail import DetailView
@@ -162,3 +163,20 @@ class Checkout(View):
         }
 
         return render(self.request, 'product/checkout.html', context)
+
+
+class Search(ProductsList):
+    def get_queryset(self, *args, **kwargs):
+        search = self.request.GET.get('search')
+        qs = super().get_queryset(*args, **kwargs)
+
+        if not search:
+            return qs
+
+        qs = qs.filter(
+            Q(name__icontains=search) |
+            Q(short_description__icontains=search) |
+            Q(long_description__icontains=search)
+        )
+
+        return qs
