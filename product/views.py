@@ -1,14 +1,11 @@
-from pprint import pprint
-
 from django.contrib import messages
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from django.views import View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from product import models
+from user_profile import models as up_models
 
 
 class ProductsList(ListView):
@@ -141,6 +138,23 @@ class Checkout(View):
     def get(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('user_profile:create')
+
+        profile = up_models.UserProfile.objects.filter(
+            user=self.request.user).exists()
+
+        if not profile:
+            messages.error(
+                self.request,
+                'User has not profile.'
+            )
+            return redirect('user_profile:create')
+
+        if not self.request.session.get('cart'):
+            messages.error(
+                self.request,
+                'Empty cart.'
+            )
+            return redirect('product:list')
 
         context = {
             'user': self.request.user,
