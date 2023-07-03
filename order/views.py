@@ -2,21 +2,37 @@
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views import View
+from django.views.generic import DetailView, ListView
 
 from order.models import Order, OrderItem
 from product import models
 from utils.cart_total import cart_total_qtt, cart_totals
 
 
-class Pay(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Pay')
+class DispatchLoginRequired(View):
+    def dispatch(self, *args, **kwargs):
+
+        if not self.request.user.is_authenticated:
+            return redirect('user_profile:create')
+
+        return super().dispatch()
+
+
+class Pay(DispatchLoginRequired, DetailView):
+    template_name = 'order/pay.html'
+    model = Order
+    pk_url_kwarg = 'pk'
+    context_object_name = 'order'
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.filter(user=self.request.user)
+        return qs
 
 
 class SaveOrder(View):
-    template_name = 'order/pay.html'
-
     def get(self, *args, **kwargs):
 
         if not self.request.user.is_authenticated:
@@ -95,7 +111,11 @@ class SaveOrder(View):
         del self.request.session['cart']
         self.request.session.save()
 
-        return redirect('order:list')
+        return redirect(
+            reverse(
+                'order:pay', kwargs={'pk': order.pk}
+            )
+        )
 
 
 class Detail(View):
