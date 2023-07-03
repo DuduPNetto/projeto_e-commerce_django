@@ -1,4 +1,3 @@
-# type: ignore
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -11,25 +10,25 @@ from product import models
 from utils.cart_total import cart_total_qtt, cart_totals
 
 
-class DispatchLoginRequired(View):
+class DispatchLoginRequiredMixin(View):
     def dispatch(self, *args, **kwargs):
 
         if not self.request.user.is_authenticated:
             return redirect('user_profile:create')
 
-        return super().dispatch()
-
-
-class Pay(DispatchLoginRequired, DetailView):
-    template_name = 'order/pay.html'
-    model = Order
-    pk_url_kwarg = 'pk'
-    context_object_name = 'order'
+        return super().dispatch(*args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.filter(user=self.request.user)
         return qs
+
+
+class Pay(DispatchLoginRequiredMixin, DetailView):
+    template_name = 'order/pay.html'
+    model = Order
+    pk_url_kwarg = 'pk'
+    context_object_name = 'order'
 
 
 class SaveOrder(View):
@@ -118,11 +117,16 @@ class SaveOrder(View):
         )
 
 
-class Detail(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('Detail')
+class Detail(DispatchLoginRequiredMixin, DetailView):
+    model = Order
+    context_object_name = 'order'
+    template_name = 'order/detail.html'
+    pk_url_kwarg = 'pk'
 
 
-class ListOrder(View):
-    def get(self, *args, **kwargs):
-        return HttpResponse('List')
+class ListOrder(DispatchLoginRequiredMixin, ListView):
+    model = Order
+    context_object_name = 'orders'
+    template_name = 'order/list.html'
+    paginate_by = 9
+    ordering = ['-id']
