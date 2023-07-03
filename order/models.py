@@ -9,6 +9,7 @@ class Order(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     total = models.FloatField()
+    quantity_total = models.PositiveIntegerField()
     status = models.CharField(default="C", max_length=1, choices=(
         ('A', 'Aprovado'), ('C', 'Criado'), ('R', 'Reprovado'),
         ('P', 'Pendente'), ('E', 'Enviado'), ('F', 'Finalizado')
@@ -27,6 +28,7 @@ class OrderItem(models.Model):
     product = models.CharField(max_length=100)
     product_id = models.PositiveIntegerField()
     variation = models.CharField(max_length=100)
+    variation_id = models.PositiveIntegerField()
     price = models.FloatField()
     promotional_price = models.FloatField(default=0)
     quantity = models.PositiveIntegerField()
